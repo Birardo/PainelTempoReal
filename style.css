@@ -1,0 +1,526 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 16px;
+    position: relative;
+    overflow-x: hidden;
+    transition: background 0.7s ease, color 0.4s ease;
+}
+
+/* Temas dinâmicos de temperatura */
+body.tema-padrao {
+    background: radial-gradient(circle at top right, #1e3a8a, #0f172a);
+    color: #ffffff;
+}
+
+/* Clima >= 37°C (Cores quentes) */
+body.tema-quente {
+    background: radial-gradient(circle at top right, #ea580c, #7f1d1d);
+    color: #ffffff;
+}
+
+/* Clima entre 25°C e 36°C (Cores neutras/verde) */
+body.tema-neutro {
+    background: radial-gradient(circle at top right, #2e7d32, #0d3b1e);
+    color: #ffffff;
+}
+
+/* Clima <= 24°C (Cores frias) */
+body.tema-frio {
+    background: radial-gradient(circle at top right, #0284c7, #0c2461);
+    color: #ffffff;
+}
+
+/* Fundo Meteorológico do Brasil */
+.fundo-meteorologico {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.grade-radar {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 45px 45px;
+}
+
+.pulso-radar {
+    position: absolute;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    animation: pulsarRadar 6s infinite ease-out;
+}
+
+@keyframes pulsarRadar {
+    0% {
+        transform: scale(0.4);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.mapa-brasil {
+    width: min(92vw, 720px);
+    height: auto;
+    opacity: 0.32;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.15));
+}
+
+.contorno-brasil {
+    fill: rgba(255, 255, 255, 0.08);
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+}
+
+.isobara {
+    stroke: rgba(255, 255, 255, 0.22);
+    stroke-width: 1.2;
+    stroke-dasharray: 6 6;
+}
+
+.ponto-estacao {
+    fill: #ffffff;
+    opacity: 0.85;
+}
+
+/* Container Principal */
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+    background: rgba(15, 23, 42, 0.42);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.selo-ao-vivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 10px;
+}
+
+.ponto-verde {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    animation: piscar 1.5s infinite alternate;
+}
+
+@keyframes piscar {
+    from { opacity: 0.4; }
+    to { opacity: 1; }
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.subtitulo {
+    font-size: 0.92rem;
+    opacity: 0.85;
+}
+
+/* Área de Busca e Barra de Recomendações */
+#form-busca {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.campo-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+#input-cidade {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 14px;
+    font-size: 1rem;
+    outline: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: #111827;
+    transition: box-shadow 0.2s ease;
+}
+
+#input-cidade:focus {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}
+
+.recomendacoes {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: rgba(17, 24, 39, 0.97);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 14px;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 20;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.recomendacoes li {
+    padding: 11px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.95rem;
+    color: #f9fafb;
+    transition: background-color 0.15s ease;
+}
+
+.recomendacoes li:last-child {
+    border-bottom: none;
+}
+
+.recomendacoes li:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.recomendacoes .uf-tag {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #cbd5e1;
+}
+
+#btn-buscar {
+    padding: 13px 22px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+#btn-buscar:hover {
+    filter: brightness(1.15);
+}
+
+#btn-buscar:active {
+    transform: scale(0.97);
+}
+
+/* Mensagens e Aviso de Cidade Inexistente */
+.mensagem {
+    text-align: center;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    font-weight: 500;
+    line-height: 1.45;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    animation: surgirSuave 0.3s ease;
+}
+
+.mensagem.erro {
+    background: rgba(185, 28, 28, 0.88);
+    border: 1px solid #fca5a5;
+    box-shadow: 0 8px 24px rgba(185, 28, 28, 0.35);
+}
+
+.mensagem .aviso-titulo {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.mensagem .aviso-detalhe {
+    font-size: 0.9rem;
+    opacity: 0.95;
+}
+
+.oculto {
+    display: none;
+}
+
+/* Painel de Clima */
+.painel {
+    animation: surgirSuave 0.4s ease;
+}
+
+@keyframes surgirSuave {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cabecalho-cidade {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.cabecalho-cidade h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.cabecalho-cidade p {
+    font-size: 0.98rem;
+    opacity: 0.9;
+    margin-top: 2px;
+}
+
+.badge-coord {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.8px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.25);
+    opacity: 0.85;
+}
+
+.destaque-temperatura {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 18px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 18px;
+}
+
+.bolha-icone {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.icone {
+    font-size: 3.2rem;
+    line-height: 1;
+}
+
+.valor-temp {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.unidade {
+    font-size: 1.7rem;
+    font-weight: 600;
+    vertical-align: top;
+}
+
+#condicao-clima {
+    margin-top: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Grid de Detalhes Atuais */
+.detalhes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.card-detalhe {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 12px 8px;
+    border-radius: 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.icone-mini {
+    font-size: 1.15rem;
+}
+
+.rotulo {
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+
+.dado {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+/* Previsão do resto da semana */
+.secao-semana {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 18px;
+}
+
+.titulo-semana {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+    opacity: 0.92;
+}
+
+.lista-semana {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.card-dia {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.card-dia:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.dia-nome {
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.dia-data {
+    font-size: 0.74rem;
+    opacity: 0.75;
+}
+
+.dia-icone {
+    font-size: 1.8rem;
+    margin: 2px 0;
+}
+
+.dia-desc {
+    font-size: 0.76rem;
+    opacity: 0.9;
+    line-height: 1.2;
+}
+
+.dia-temps {
+    display: flex;
+    gap: 8px;
+    font-size: 0.88rem;
+    margin-top: 2px;
+}
+
+.temp-max {
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.temp-min {
+    font-weight: 500;
+    opacity: 0.78;
+}
+
+/* Responsividade para celulares */
+@media (max-width: 520px) {
+    .container {
+        padding: 20px;
+    }
+
+    #form-busca {
+        flex-direction: column;
+    }
+
+    #btn-buscar {
+        width: 100%;
+    }
+
+    .detalhes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-detalhe {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 12px 16px;
+    }
+
+    .lista-semana {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

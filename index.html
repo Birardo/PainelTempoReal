@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Climático Brasil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="tema-padrao">
+    <!-- Fundo Meteorológico do Brasil -->
+    <div class="fundo-meteorologico" aria-hidden="true">
+        <div class="grade-radar"></div>
+        <div class="pulso-radar"></div>
+        <svg class="mapa-brasil" viewBox="0 0 600 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="320" cy="300" r="140" class="isobara" />
+            <circle cx="320" cy="300" r="220" class="isobara" />
+            <circle cx="320" cy="300" r="290" class="isobara" />
+            <path class="contorno-brasil" d="M235 38 L278 52 L310 92 L355 98 L405 128 L468 152 L532 185 L555 215 L542 260 L515 305 L495 355 L465 405 L425 438 L392 465 L368 505 L342 548 L312 582 L285 565 L292 528 L268 492 L252 448 L225 415 L212 372 L175 348 L128 325 L78 298 L52 262 L75 218 L112 185 L125 142 L158 105 L198 85 L215 52 Z" />
+            <circle cx="240" cy="180" r="4" class="ponto-estacao" />
+            <circle cx="485" cy="215" r="4" class="ponto-estacao" />
+            <circle cx="355" cy="325" r="5" class="ponto-estacao" />
+            <circle cx="415" cy="425" r="5" class="ponto-estacao" />
+            <circle cx="325" cy="525" r="4" class="ponto-estacao" />
+            <circle cx="285" cy="370" r="4" class="ponto-estacao" />
+        </svg>
+    </div>
+
+    <main class="container">
+        <header>
+            <div class="selo-ao-vivo">
+                <span class="ponto-verde"></span> RADAR METEOROLÓGICO • BRASIL
+            </div>
+            <h1>Painel Climático Brasil</h1>
+            <p class="subtitulo">Monitoramento atmosférico e previsão semanal</p>
+        </header>
+
+        <section class="area-busca">
+            <form id="form-busca">
+                <div class="campo-wrapper">
+                    <input 
+                        type="text" 
+                        id="input-cidade" 
+                        placeholder="Digite uma cidade (ex: sao, rio, curitiba)..." 
+                        autocomplete="off"
+                    >
+                    <ul id="lista-recomendacoes" class="recomendacoes oculto" role="listbox"></ul>
+                </div>
+                <button type="submit" id="btn-buscar">Buscar</button>
+            </form>
+        </section>
+
+        <!-- Área de aviso / erro / carregamento -->
+        <section id="area-mensagem" class="mensagem oculto" aria-live="polite"></section>
+
+        <section id="painel-clima" class="painel oculto">
+            <div class="cabecalho-cidade">
+                <h2 id="nome-cidade">--</h2>
+                <p id="regiao-pais">--</p>
+                <span id="coordenadas-cidade" class="badge-coord">LAT -- • LON --</span>
+            </div>
+
+            <div class="destaque-temperatura">
+                <div class="bolha-icone">
+                    <span id="icone-clima" class="icone" role="img" aria-label="Ícone do clima">☀️</span>
+                </div>
+                <div class="valor-temp">
+                    <span id="temperatura">--</span><span class="unidade">°C</span>
+                </div>
+                <p id="condicao-clima">--</p>
+            </div>
+
+            <div class="detalhes-grid">
+                <div class="card-detalhe">
+                    <span class="icone-mini">🌡️</span>
+                    <span class="rotulo">Sensação</span>
+                    <span id="sensacao-termica" class="dado">-- °C</span>
+                </div>
+                <div class="card-detalhe">
+                    <span class="icone-mini">💧</span>
+                    <span class="rotulo">Umidade</span>
+                    <span id="umidade" class="dado">-- %</span>
+                </div>
+                <div class="card-detalhe">
+                    <span class="icone-mini">💨</span>
+                    <span class="rotulo">Vento</span>
+                    <span id="vento" class="dado">-- km/h</span>
+                </div>
+            </div>
+
+            <!-- Previsão do resto da semana -->
+            <div class="secao-semana">
+                <h3 class="titulo-semana">Previsão para o resto da semana</h3>
+                <div id="lista-semana" class="lista-semana"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
